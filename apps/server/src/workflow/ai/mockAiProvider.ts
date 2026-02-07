@@ -25,13 +25,69 @@ export class MockAiProvider implements AiProvider {
       return { prompt: `[MOCK ${ctx.roundType}] ${question}` };
     }
 
-    const base =
-      ctx.roundType === "TECHNICAL"
-        ? "Explain how you would design a rate limiter for an API."
-        : "You discover latency spikes after a deployment. Walk through your approach.";
+    if (ctx.roundType === "SCENARIO") {
+      const scenarioNum = (ctx.questionIndex ?? 0) + 1;
+
+      const roleScenarios: Record<string, string[]> = {
+        "Frontend Developer": [
+          "[SCENARIO - Part A] A user reports that the checkout button does nothing when clicked. No errors are visible. What are your first steps?",
+          "[SCENARIO - Part B] You find it's a race condition in the state management library. How do you fix it and prevent the user from double-clicking?",
+          "[SCENARIO - Part C] How would you architect the form handling to be more robust against network latency and state inconsistencies in the future?"
+        ],
+        "Backend Developer": [
+          "[SCENARIO - Part A] Your API latency spiked to 5 seconds. Database CPU is at 99%. What is your immediate reaction?",
+          "[SCENARIO - Part B] You identify a missing index on a large table. Adding it will lock the table. How do you proceed?",
+          "[SCENARIO - Part C] How do you redesign the schema or caching strategy to handle 10x scale next year?"
+        ],
+        "DevOps Engineer": [
+          "[SCENARIO - Part A] The deployment pipeline failed, and the production site is returning 500 errors. What do you do?",
+          "[SCENARIO - Part B] A bad config was pushed. Rollback failed because of a schema change. How do you recover?",
+          "[SCENARIO - Part C] How do you implement a blue-green deployment strategy to prevent this failure mode?"
+        ]
+      };
+
+      const defaultScenario = [
+        "[SCENARIO - Part A] A critical system component has failed. What are your first steps?",
+        "[SCENARIO - Part B] You've identified the root cause. How do you fix it while maintaining service availability?",
+        "[SCENARIO - Part C] How do you prevent this class of errors from recurring?"
+      ];
+
+      const questions = roleScenarios[ctx.role] || defaultScenario;
+      return { prompt: `[MOCK ${ctx.role}] ${questions[Math.min(scenarioNum - 1, 2)]}` };
+    }
+
+    if (ctx.roundType === "TECHNICAL") {
+      const idx = ctx.questionIndex ?? 0;
+      const roleTech: Record<string, string[]> = {
+        "Frontend Developer": [
+          "Explain the Virtual DOM and how it differs from the real DOM.",
+          "How do you optimize the rendering performance of a large list in React?",
+          "Discuss the trade-offs between Client-Side Rendering (CSR) and Server-Side Rendering (SSR)."
+        ],
+        "Backend Developer": [
+          "Explain the difference between SQL and NoSQL databases. When would you use each?",
+          "How do you handle concurrent transactions in a database to ensure consistency?",
+          "Design a rate-limiting system for a public API."
+        ],
+        "DevOps Engineer": [
+          "Explain the concept of Infrastructure as Code (IaC).",
+          "How does a container differ from a virtual machine?",
+          "Describe a strategy for zero-downtime deployment."
+        ]
+      };
+
+      const defaultTech = [
+        "Explain a fundamental concept in your primary programming language.",
+        "Describe how you would debug a complex issue in a production system.",
+        "Design a scalable architecture for a high-traffic feature."
+      ];
+
+      const questions = roleTech[ctx.role] || defaultTech;
+      return { prompt: `[MOCK ${ctx.role} - ${ctx.level}] ${questions[Math.min(idx, 2)]}` };
+    }
 
     return {
-      prompt: `[MOCK ${ctx.roundType}] ${base}`
+      prompt: `[MOCK ${ctx.roundType}] Describe a challenging problem you solved recently.`
     };
   }
 

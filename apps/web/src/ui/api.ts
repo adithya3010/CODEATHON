@@ -11,6 +11,8 @@ export type InterviewStateResponse = {
     questionsAsked: number;
     verdict: string | null;
     weightedScore: number | null;
+    feedback: string | null;
+    dimensions: Record<string, number> | null;
   }>;
   memory: { strengths: string[]; weaknesses: string[]; notes: string[] };
 };

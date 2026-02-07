@@ -325,6 +325,7 @@ export class InterviewOrchestrator {
       level: session.context.level,
       memory: session.memory,
       askedQuestions,
+      questionIndex: round.questions.length,
       resumeContext
     });
 
@@ -463,7 +464,9 @@ export class InterviewOrchestrator {
         answers: r.answers.length,
         questionsAsked: r.questions.length,
         verdict: r.verdict,
-        weightedScore: r.scorecard?.weightedScore ?? null
+        weightedScore: r.scorecard?.weightedScore ?? null,
+        feedback: r.scorecard?.reasoning ?? null,
+        dimensions: r.scorecard?.dimensions ?? null
       })),
       profile: session.profile,
       memory: session.memory

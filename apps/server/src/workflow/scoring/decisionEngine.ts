@@ -81,7 +81,7 @@ export class DecisionEngine {
     const scorecard: Scorecard = {
       dimensions,
       weightedScore,
-      reasoning: params.reasoningTexts.filter(Boolean).join(" "),
+      reasoning: [...new Set(params.reasoningTexts.filter(Boolean))].join("\n\n"),
       rawEvaluation: {
         perAnswer,
         aggregate: dimensions

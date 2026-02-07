@@ -20,14 +20,14 @@ export const roundConfigs: Record<RoundType, RoundScoringConfig> = {
     roundType: "TECHNICAL",
     dimensions: ["accuracy", "completeness", "clarity"],
     weights: { accuracy: 0.5, completeness: 0.3, clarity: 0.2 },
-    passThreshold: 65,
+    passThreshold: 60,
     questionsPerRound: 3
   },
   SCENARIO: {
     roundType: "SCENARIO",
     dimensions: ["reasoning", "tradeoffs", "communication"],
     weights: { reasoning: 0.4, tradeoffs: 0.3, communication: 0.3 },
-    passThreshold: 70,
-    questionsPerRound: 2
+    passThreshold: 60,
+    questionsPerRound: 3
   }
 };

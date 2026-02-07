@@ -12,6 +12,7 @@ export type QuestionGenerationContext = {
     notes: string[];
   };
   askedQuestions: string[];
+  questionIndex: number; // 0-based index of the question in the current round
   resumeContext?: {
     extractedText: string;
     analysis?: {
