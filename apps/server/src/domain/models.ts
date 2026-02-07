@@ -67,6 +67,18 @@ export type AuditEvent = {
   details: Record<string, unknown>;
 };
 
+export type ResumeData = {
+  fileName: string;
+  uploadedAt: IsoDateTime;
+  extractedText: string;
+  analysis?: {
+    experience: string[];
+    skills: string[];
+    education: string[];
+    summary: string;
+  };
+};
+
 export type InterviewSession = {
   id: Uuid;
   candidateId: Uuid;
@@ -75,6 +87,7 @@ export type InterviewSession = {
     role: string;
     level: "junior" | "mid" | "senior";
   };
+  resume?: ResumeData;
   startedAt: IsoDateTime;
   endedAt: IsoDateTime | null;
   rounds: InterviewRound[];

@@ -2,9 +2,19 @@
 
 This repo implements a **deterministic, explainable** multi-round interview workflow:
 
-`SCREENING → TECHNICAL → SCENARIO → FINAL_DECISION` (or `REJECTED`).
+`SCREENING (with Resume) → TECHNICAL → SCENARIO → FINAL_DECISION` (or `REJECTED`).
+
+## Round 1: SCREENING
+- **Resume Upload**: Candidates upload their resume (optional but recommended)
+- **Resume Analysis**: AI extracts experience, skills, and education
+- **Communication Check**: Questions focus on:
+  - How candidates communicate their technical achievements
+  - Ability to explain complex concepts clearly
+  - Presentation of relevant experience
+- **Scoring Dimensions**: communication (40%), relevance (35%), presentation (25%)
 
 AI is used **only** for:
+- analyzing resume content (SCREENING round)
 - generating the next question text
 - evaluating a given answer into **strict JSON** scores
 
@@ -57,8 +67,10 @@ Key modules:
 ```bash
 curl -s -X POST http://localhost:3001/interview/start \
   -H "content-type: application/json" \
-  -d '{"role":"backend","level":"mid"}' | jq
+  -d '{"role":"backend","level":"mid","resumeText":"John Doe...","resumeFileName":"resume.txt"}' | jq
 ```
+
+Note: `resumeText` and `resumeFileName` are optional. When provided, the resume will be analyzed during the SCREENING round.
 
 ### POST /interview/answer
 

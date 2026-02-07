@@ -3,7 +3,13 @@ import type { InterviewOrchestrator } from "../interviewOrchestrator.js";
 export class InterviewController {
   constructor(private readonly orchestrator: InterviewOrchestrator) {}
 
-  async startInterview(body: { candidateId?: string; role: string; level: "junior" | "mid" | "senior" }) {
+  async startInterview(body: { 
+    candidateId?: string; 
+    role: string; 
+    level: "junior" | "mid" | "senior";
+    resumeText?: string;
+    resumeFileName?: string;
+  }) {
     return this.orchestrator.startInterview(body);
   }
 

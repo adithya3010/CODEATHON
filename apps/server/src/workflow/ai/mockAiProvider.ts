@@ -2,12 +2,20 @@ import type { AiProvider, EvaluationResponse, GeneratedQuestion, QuestionGenerat
 
 export class MockAiProvider implements AiProvider {
   async generateQuestion(ctx: QuestionGenerationContext): Promise<GeneratedQuestion> {
+    if (ctx.roundType === "SCREENING") {
+      // Resume-based communication questions
+      const questions = [
+        "Based on your resume, tell me about your most significant technical achievement and how you communicated it to stakeholders.",
+        "I see you have experience with various technologies. How do you typically explain complex technical concepts to non-technical team members?"
+      ];
+      const idx = ctx.askedQuestions.length % questions.length;
+      return { prompt: `[MOCK ${ctx.roundType}] ${questions[idx]}` };
+    }
+
     const base =
-      ctx.roundType === "SCREENING"
-        ? "Tell me about a time you collaborated across teams."
-        : ctx.roundType === "TECHNICAL"
-          ? "Explain how you would design a rate limiter for an API."
-          : "You discover latency spikes after a deployment. Walk through your approach.";
+      ctx.roundType === "TECHNICAL"
+        ? "Explain how you would design a rate limiter for an API."
+        : "You discover latency spikes after a deployment. Walk through your approach.";
 
     return {
       prompt: `[MOCK ${ctx.roundType}] ${base}`
@@ -31,9 +39,9 @@ export class MockAiProvider implements AiProvider {
     switch (params.roundType) {
       case "SCREENING":
         json = {
-          clarity: score((len > 120 ? 7 : 5) + (hasStructure ? 1 : 0)),
-          confidence: score(len > 60 ? 6 : 4),
-          completeness: score((len > 150 ? 7 : 5) + (hasStructure ? 1 : 0))
+          communication: score((len > 120 ? 7 : 5) + (hasStructure ? 2 : 0)),
+          relevance: score((/project|experience|team|delivered|implemented/i.test(params.answer) ? 7 : 5)),
+          presentation: score((len > 100 ? 6 : 4) + (hasStructure ? 1 : 0))
         };
         break;
       case "TECHNICAL":
@@ -60,5 +68,34 @@ export class MockAiProvider implements AiProvider {
         weaknesses: len < 80 ? ["Insufficient detail"] : undefined
       }
     };
+  }
+
+  async analyzeResume(resumeText: string, targetRole: string): Promise<{
+    experience: string[];
+    skills: string[];
+    education: string[];
+    summary: string;
+  }> {
+    // Mock resume analysis - extract basic patterns
+    const experience: string[] = [];
+    const skills: string[] = [];
+    const education: string[] = [];
+
+    // Simple pattern matching for demo
+    const techKeywords = /\b(javascript|typescript|python|java|react|node|aws|docker|kubernetes|sql)\b/gi;
+    const matches = resumeText.match(techKeywords) || [];
+    const uniqueSkills = [...new Set(matches.map(s => s.toLowerCase()))];
+    skills.push(...uniqueSkills.slice(0, 10));
+
+    // Extract years of experience pattern
+    const yearsPattern = /(\d+)\s*(years?|yrs?)/gi;
+    const yearsMatch = resumeText.match(yearsPattern);
+    if (yearsMatch) {
+      experience.push(`Mentioned experience: ${yearsMatch[0]}`);
+    }
+
+    const summary = `Mock analysis: Resume appears to be for ${targetRole} role. Detected ${skills.length} relevant skills. Text length: ${resumeText.length} characters.`;
+
+    return { experience, skills, education, summary };
   }
 }

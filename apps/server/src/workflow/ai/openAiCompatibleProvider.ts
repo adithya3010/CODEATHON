@@ -28,7 +28,8 @@ export class OpenAiCompatibleProvider implements AiProvider {
       role: ctx.role,
       level: ctx.level,
       memory: ctx.memory,
-      askedQuestions: ctx.askedQuestions
+      askedQuestions: ctx.askedQuestions,
+      resumeContext: ctx.resumeContext
     };
 
     const text = await this.chatText({
@@ -38,6 +39,53 @@ export class OpenAiCompatibleProvider implements AiProvider {
     });
 
     return { prompt: text.trim() };
+  }
+
+  async analyzeResume(resumeText: string, targetRole: string): Promise<{
+    experience: string[];
+    skills: string[];
+    education: string[];
+    summary: string;
+  }> {
+    const system = "You analyze resumes and extract structured information. Output STRICT JSON only.";
+    
+    const schema = {
+      name: "ResumeAnalysis",
+      schema: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          experience: { type: "array", items: { type: "string" } },
+          skills: { type: "array", items: { type: "string" } },
+          education: { type: "array", items: { type: "string" } },
+          summary: { type: "string" }
+        },
+        required: ["experience", "skills", "education", "summary"]
+      },
+      strict: true
+    };
+
+    const user = {
+      resumeText,
+      targetRole,
+      instruction: "Extract experience entries, technical skills, education details, and provide a brief summary."
+    };
+
+    const jsonText = await this.chatJson({
+      system,
+      user: JSON.stringify(user),
+      jsonSchema: schema,
+      temperature: 0.0
+    });
+
+    const result = safeJsonParse(jsonText) as {
+      experience: string[];
+      skills: string[];
+      education: string[];
+      summary: string;
+    };
+
+    return result;
   }
 
   async evaluateAnswer(params: {
@@ -50,7 +98,7 @@ export class OpenAiCompatibleProvider implements AiProvider {
     // We request a JSON object that includes all dimensions and a short summary.
 
     const dimsByRound: Record<RoundType, string[]> = {
-      SCREENING: ["clarity", "confidence", "completeness"],
+      SCREENING: ["communication", "relevance", "presentation"],
       TECHNICAL: ["accuracy", "completeness", "clarity"],
       SCENARIO: ["reasoning", "tradeoffs", "communication"]
     };

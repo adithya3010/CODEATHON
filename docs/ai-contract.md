@@ -2,6 +2,7 @@
 
 The AI layer is constrained:
 
+- Analyzes resumes (optional, for SCREENING round context)
 - Generates a question (plain text)
 - Evaluates a single answer and returns **STRICT JSON only**
 
@@ -10,11 +11,24 @@ The backend:
 - aggregates per-answer evaluations deterministically
 - applies weights and thresholds to compute verdicts
 
+## Resume Analysis (Optional)
+
+For SCREENING round, AI can analyze uploaded resume:
+
+```json
+{
+  "experience": ["5 years backend development", "Led team of 4 engineers"],
+  "skills": ["javascript", "python", "aws", "docker"],
+  "education": ["BS Computer Science, MIT"],
+  "summary": "Experienced full-stack engineer with cloud expertise"
+}
+```
+
 ## Evaluation JSON
 
 Backend expects dimensions by round:
 
-- SCREENING: clarity, confidence, completeness
+- SCREENING: communication, relevance, presentation
 - TECHNICAL: accuracy, completeness, clarity
 - SCENARIO: reasoning, tradeoffs, communication
 
@@ -24,10 +38,10 @@ Example:
 
 ```json
 {
-  "clarity": 7,
-  "confidence": 6,
-  "completeness": 8,
-  "summary": "Well-structured, but missed concrete examples"
+  "communication": 8,
+  "relevance": 7,
+  "presentation": 7,
+  "summary": "Strong communication with relevant experience examples"
 }
 ```
 

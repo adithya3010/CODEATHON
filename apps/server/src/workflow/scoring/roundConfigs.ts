@@ -11,10 +11,10 @@ export type RoundScoringConfig = {
 export const roundConfigs: Record<RoundType, RoundScoringConfig> = {
   SCREENING: {
     roundType: "SCREENING",
-    dimensions: ["clarity", "confidence", "completeness"],
-    weights: { clarity: 0.4, confidence: 0.3, completeness: 0.3 },
+    dimensions: ["communication", "relevance", "presentation"],
+    weights: { communication: 0.4, relevance: 0.35, presentation: 0.25 },
     passThreshold: 60,
-    questionsPerRound: 3
+    questionsPerRound: 2
   },
   TECHNICAL: {
     roundType: "TECHNICAL",

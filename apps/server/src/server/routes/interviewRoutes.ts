@@ -6,7 +6,9 @@ import type { Container } from "../../wiring/container.js";
 const StartInterviewRequest = z.object({
   candidateId: z.string().min(1).optional(),
   role: z.string().min(1).default("backend"),
-  level: z.enum(["junior", "mid", "senior"]).default("mid")
+  level: z.enum(["junior", "mid", "senior"]).default("mid"),
+  resumeText: z.string().optional(),
+  resumeFileName: z.string().optional()
 });
 
 const AnswerRequest = z.object({

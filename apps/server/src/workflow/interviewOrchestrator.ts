@@ -30,7 +30,13 @@ export class InterviewOrchestrator {
     }
   ) {}
 
-  async startInterview(params: { candidateId?: string; role: string; level: "junior" | "mid" | "senior" }) {
+  async startInterview(params: { 
+    candidateId?: string; 
+    role: string; 
+    level: "junior" | "mid" | "senior";
+    resumeText?: string;
+    resumeFileName?: string;
+  }) {
     const candidateId = params.candidateId ?? uuidv4();
     const sessionId = uuidv4();
 
@@ -59,7 +65,40 @@ export class InterviewOrchestrator {
       auditLog: []
     };
 
-    this.appendAudit(session, "SESSION_STARTED", { role: params.role, level: params.level });
+    // If resume provided, analyze it before starting
+    if (params.resumeText && params.resumeFileName) {
+      const extractedText = params.resumeText;
+      
+      let analysis: any = undefined;
+      if (this.deps.aiProvider.analyzeResume) {
+        try {
+          analysis = await this.deps.aiProvider.analyzeResume(extractedText, params.role);
+          
+          // Populate initial memory from resume
+          if (analysis.skills && analysis.skills.length > 0) {
+            session.memory.strengths.push(`Resume skills: ${analysis.skills.slice(0, 5).join(", ")}`);
+          }
+        } catch (err) {
+          this.deps.logger.warn({ err }, "resume_analysis_failed");
+        }
+      }
+
+      session.resume = {
+        fileName: params.resumeFileName,
+        uploadedAt: now,
+        extractedText,
+        analysis
+      };
+
+      this.appendAudit(session, "SESSION_STARTED", { 
+        role: params.role, 
+        level: params.level, 
+        resumeUploaded: true,
+        resumeFileName: params.resumeFileName
+      });
+    } else {
+      this.appendAudit(session, "SESSION_STARTED", { role: params.role, level: params.level });
+    }
 
     await this.deps.candidateRepo.upsert(candidate);
     await this.deps.sessionRepo.upsert(session);
@@ -252,12 +291,18 @@ export class InterviewOrchestrator {
   private async askNextQuestion(session: InterviewSession, round: InterviewRound) {
     const askedQuestions = session.rounds.flatMap((r) => r.questions.map((q) => q.prompt));
 
+    const resumeContext = session.resume ? {
+      extractedText: session.resume.extractedText,
+      analysis: session.resume.analysis
+    } : undefined;
+
     const q = await this.deps.aiProvider.generateQuestion({
       roundType: round.roundType,
       role: session.context.role,
       level: session.context.level,
       memory: session.memory,
-      askedQuestions
+      askedQuestions,
+      resumeContext
     });
 
     const question: InterviewQuestion = {

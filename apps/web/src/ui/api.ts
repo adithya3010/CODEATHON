@@ -14,7 +14,12 @@ export type InterviewStateResponse = {
   memory: { strengths: string[]; weaknesses: string[]; notes: string[] };
 };
 
-export async function startInterview(params: { role: string; level: "junior" | "mid" | "senior" }) {
+export async function startInterview(params: { 
+  role: string; 
+  level: "junior" | "mid" | "senior";
+  resumeText?: string;
+  resumeFileName?: string;
+}) {
   const resp = await fetch("/interview/start", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

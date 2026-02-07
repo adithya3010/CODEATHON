@@ -12,6 +12,15 @@ export type QuestionGenerationContext = {
     notes: string[];
   };
   askedQuestions: string[];
+  resumeContext?: {
+    extractedText: string;
+    analysis?: {
+      experience: string[];
+      skills: string[];
+      education: string[];
+      summary: string;
+    };
+  };
 };
 
 export type GeneratedQuestion = {
@@ -36,6 +45,12 @@ export interface AiProvider {
     answer: string;
     memory: QuestionGenerationContext["memory"];
   }): Promise<EvaluationResponse>;
+  analyzeResume?(resumeText: string, targetRole: string): Promise<{
+    experience: string[];
+    skills: string[];
+    education: string[];
+    summary: string;
+  }>;
 }
 
 export const MemoryHintsSchema = z

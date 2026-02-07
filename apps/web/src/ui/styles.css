@@ -128,3 +128,121 @@ hr {
   border-top: 1px solid rgba(255,255,255,0.14);
   margin: 12px 0;
 }
+
+.info-banner {
+  background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.15));
+  border: 1px solid rgba(139,92,246,0.3);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  color: #e0e7ff;
+}
+
+.resume-upload-section {
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.file-upload-wrapper {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.file-upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  border: 2px dashed rgba(99,102,241,0.4);
+  border-radius: 12px;
+  background: rgba(99,102,241,0.05);
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #c7d2fe;
+  gap: 6px;
+}
+
+.file-upload-label:hover {
+  border-color: rgba(99,102,241,0.6);
+  background: rgba(99,102,241,0.1);
+}
+
+.resume-success {
+  background: rgba(16,185,129,0.1);
+  border: 1px solid rgba(16,185,129,0.3);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(239,68,68,0.15);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-top: 10px;
+  color: #fca5a5;
+  font-size: 13px;
+}
+
+.progress-section {
+  margin-bottom: 12px;
+}
+
+.round-card {
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+.verdict-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.verdict-badge.pass {
+  background: rgba(16,185,129,0.2);
+  border: 1px solid rgba(16,185,129,0.4);
+  color: #6ee7b7;
+}
+
+.verdict-badge.fail {
+  background: rgba(239,68,68,0.2);
+  border: 1px solid rgba(239,68,68,0.4);
+  color: #fca5a5;
+}
+
+.insight-card {
+  background: rgba(0,0,0,0.2);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 8px;
+}
+
+.insight-card.strength {
+  border-left: 3px solid rgba(16,185,129,0.6);
+}
+
+.insight-card.weakness {
+  border-left: 3px solid rgba(251,191,36,0.6);
+}
+
+.result-card {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 12px;
+  max-height: 300px;
+  overflow: auto;
+}
