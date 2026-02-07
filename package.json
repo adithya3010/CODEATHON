@@ -1,0 +1,17 @@
+{
+  "name": "codeathon-interview-orchestrator",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @app/server",
+    "dev:all": "concurrently -n server,web -c blue,green \"npm run dev -w @app/server\" \"npm run dev -w @app/web\"",
+    "build": "npm run build -ws",
+    "build:all": "npm run build -ws",
+    "typecheck": "npm run typecheck -ws"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

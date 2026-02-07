@@ -1,0 +1,47 @@
+import { z } from "zod";
+
+import type { RoundType } from "../../domain/types.js";
+
+export type QuestionGenerationContext = {
+  roundType: RoundType;
+  role: string;
+  level: "junior" | "mid" | "senior";
+  memory: {
+    strengths: string[];
+    weaknesses: string[];
+    notes: string[];
+  };
+  askedQuestions: string[];
+};
+
+export type GeneratedQuestion = {
+  prompt: string;
+};
+
+export type EvaluationResponse = {
+  json: unknown; // validated later by DecisionEngine per-round
+  reasoningText: string; // allowed, but does not drive decisions
+  memoryHints?: {
+    strengths?: string[];
+    weaknesses?: string[];
+    notes?: string[];
+  };
+};
+
+export interface AiProvider {
+  generateQuestion(ctx: QuestionGenerationContext): Promise<GeneratedQuestion>;
+  evaluateAnswer(params: {
+    roundType: RoundType;
+    question: string;
+    answer: string;
+    memory: QuestionGenerationContext["memory"];
+  }): Promise<EvaluationResponse>;
+}
+
+export const MemoryHintsSchema = z
+  .object({
+    strengths: z.array(z.string().min(1)).optional(),
+    weaknesses: z.array(z.string().min(1)).optional(),
+    notes: z.array(z.string().min(1)).optional()
+  })
+  .strict();
