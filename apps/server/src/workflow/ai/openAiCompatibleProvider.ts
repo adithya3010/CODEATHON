@@ -21,7 +21,7 @@ export class OpenAiCompatibleProvider implements AiProvider {
 
   async generateQuestion(ctx: QuestionGenerationContext): Promise<GeneratedQuestion> {
     const system =
-      "You generate ONE interview question. Do not evaluate. Do not decide pass/fail. Output plain text only.";
+      "You generate ONE creative and non-generic interview question. Do not evaluate. Do not decide pass/fail. Output plain text only. STRICTLY do not repeat any question from the 'askedQuestions' list. Focus on the candidate's specific role and level.";
 
     const user = {
       roundType: ctx.roundType,
@@ -35,7 +35,7 @@ export class OpenAiCompatibleProvider implements AiProvider {
     const text = await this.chatText({
       system,
       user: JSON.stringify(user),
-      temperature: 0.4
+      temperature: 0.7
     });
 
     return { prompt: text.trim() };
@@ -48,7 +48,7 @@ export class OpenAiCompatibleProvider implements AiProvider {
     summary: string;
   }> {
     const system = "You analyze resumes and extract structured information. Output STRICT JSON only.";
-    
+
     const schema = {
       name: "ResumeAnalysis",
       schema: {
@@ -86,6 +86,26 @@ export class OpenAiCompatibleProvider implements AiProvider {
     };
 
     return result;
+  }
+
+  async generateProfile(ctx: {
+    transcript: { question: string; answer: string }[];
+    role: string;
+    level: string;
+  }): Promise<string> {
+    const system = "You are an expert recruiter. Analyze the interview transcript and generate a professional profile summary for the candidate. Focus on their communication skills, technical depth, and cultural fit. Output plain text.";
+
+    const user = {
+      role: ctx.role,
+      level: ctx.level,
+      transcript: ctx.transcript
+    };
+
+    return await this.chatText({
+      system,
+      user: JSON.stringify(user),
+      temperature: 0.7
+    });
   }
 
   async evaluateAnswer(params: {

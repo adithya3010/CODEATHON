@@ -56,14 +56,14 @@ export type StructuredMemory = {
 export type AuditEvent = {
   at: IsoDateTime;
   type:
-    | "SESSION_STARTED"
-    | "ROUND_STARTED"
-    | "QUESTION_ASKED"
-    | "ANSWER_SUBMITTED"
-    | "ANSWER_EVALUATED"
-    | "ROUNDED_SCORED"
-    | "ROUND_VERDICT"
-    | "SESSION_VERDICT";
+  | "SESSION_STARTED"
+  | "ROUND_STARTED"
+  | "QUESTION_ASKED"
+  | "ANSWER_SUBMITTED"
+  | "ANSWER_EVALUATED"
+  | "ROUNDED_SCORED"
+  | "ROUND_VERDICT"
+  | "SESSION_VERDICT";
   details: Record<string, unknown>;
 };
 
@@ -91,6 +91,7 @@ export type InterviewSession = {
   startedAt: IsoDateTime;
   endedAt: IsoDateTime | null;
   rounds: InterviewRound[];
+  profile?: string;
   memory: StructuredMemory;
   auditLog: AuditEvent[];
 };

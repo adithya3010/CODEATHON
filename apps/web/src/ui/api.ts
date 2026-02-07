@@ -4,6 +4,7 @@ export type InterviewStateResponse = {
   state: string;
   currentRound: string | null;
   activeQuestion: { id: string; prompt: string; roundType: string } | null;
+  profile?: string;
   progress: Array<{
     roundType: string;
     answers: number;
@@ -14,8 +15,8 @@ export type InterviewStateResponse = {
   memory: { strengths: string[]; weaknesses: string[]; notes: string[] };
 };
 
-export async function startInterview(params: { 
-  role: string; 
+export async function startInterview(params: {
+  role: string;
   level: "junior" | "mid" | "senior";
   resumeText?: string;
   resumeFileName?: string;

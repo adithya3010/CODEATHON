@@ -28,11 +28,11 @@ export class InterviewOrchestrator {
       decisionEngine: DecisionEngine;
       logger: pino.Logger;
     }
-  ) {}
+  ) { }
 
-  async startInterview(params: { 
-    candidateId?: string; 
-    role: string; 
+  async startInterview(params: {
+    candidateId?: string;
+    role: string;
     level: "junior" | "mid" | "senior";
     resumeText?: string;
     resumeFileName?: string;
@@ -68,12 +68,12 @@ export class InterviewOrchestrator {
     // If resume provided, analyze it before starting
     if (params.resumeText && params.resumeFileName) {
       const extractedText = params.resumeText;
-      
+
       let analysis: any = undefined;
       if (this.deps.aiProvider.analyzeResume) {
         try {
           analysis = await this.deps.aiProvider.analyzeResume(extractedText, params.role);
-          
+
           // Populate initial memory from resume
           if (analysis.skills && analysis.skills.length > 0) {
             session.memory.strengths.push(`Resume skills: ${analysis.skills.slice(0, 5).join(", ")}`);
@@ -90,9 +90,9 @@ export class InterviewOrchestrator {
         analysis
       };
 
-      this.appendAudit(session, "SESSION_STARTED", { 
-        role: params.role, 
-        level: params.level, 
+      this.appendAudit(session, "SESSION_STARTED", {
+        role: params.role,
+        level: params.level,
         resumeUploaded: true,
         resumeFileName: params.resumeFileName
       });
@@ -197,6 +197,29 @@ export class InterviewOrchestrator {
 
         await this.persistLiveState(session, { completed: true });
         return this.toPublicState(session);
+      }
+
+      // If passing locally (or just finished), try generating profile if provider supports it.
+      // We do this if we are passing the SCREENING round specifically, or just every round?
+      // Requirement says "for 1st round... build a profile". 
+      if (round.roundType === "SCREENING" && this.deps.aiProvider.generateProfile) {
+        try {
+          const transcript = round.questions.map(q => {
+            const a = round.answers.find(ans => ans.questionId === q.id);
+            return { question: q.prompt, answer: a?.answerText ?? "" };
+          });
+
+          const profile = await this.deps.aiProvider.generateProfile({
+            transcript,
+            role: session.context.role,
+            level: session.context.level
+          });
+
+          session.profile = profile;
+          await this.deps.sessionRepo.upsert(session);
+        } catch (err) {
+          this.deps.logger.warn({ err }, "profile_generation_failed");
+        }
       }
 
       const nr = nextRound(round.roundType);
@@ -442,6 +465,7 @@ export class InterviewOrchestrator {
         verdict: r.verdict,
         weightedScore: r.scorecard?.weightedScore ?? null
       })),
+      profile: session.profile,
       memory: session.memory
     };
   }

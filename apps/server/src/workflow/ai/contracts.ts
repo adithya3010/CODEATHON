@@ -51,6 +51,11 @@ export interface AiProvider {
     education: string[];
     summary: string;
   }>;
+  generateProfile?(context: {
+    transcript: { question: string; answer: string }[];
+    role: string;
+    level: string;
+  }): Promise<string>;
 }
 
 export const MemoryHintsSchema = z

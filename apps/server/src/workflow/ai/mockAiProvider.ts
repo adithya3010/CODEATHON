@@ -3,13 +3,26 @@ import type { AiProvider, EvaluationResponse, GeneratedQuestion, QuestionGenerat
 export class MockAiProvider implements AiProvider {
   async generateQuestion(ctx: QuestionGenerationContext): Promise<GeneratedQuestion> {
     if (ctx.roundType === "SCREENING") {
-      // Resume-based communication questions
-      const questions = [
-        "Based on your resume, tell me about your most significant technical achievement and how you communicated it to stakeholders.",
-        "I see you have experience with various technologies. How do you typically explain complex technical concepts to non-technical team members?"
+      // Pool of screening questions - more than needed to avoid repetition
+      const allQuestions = [
+        "Tell me about a challenging project where you had to communicate technical decisions to non-technical stakeholders.",
+        "Describe a situation where you had to quickly learn a new technology. How did you approach it?",
+        "What's your process for breaking down a complex problem into manageable parts?",
+        "Give me an example of how you've contributed to improving team processes or workflows.",
+        "Describe a time when you received critical feedback. How did you respond?",
+        "What motivates you in your work, and how do you stay productive during challenging periods?"
       ];
-      const idx = ctx.askedQuestions.length % questions.length;
-      return { prompt: `[MOCK ${ctx.roundType}] ${questions[idx]}` };
+
+      // Filter out already asked questions
+      const availableQuestions = allQuestions.filter(q =>
+        !ctx.askedQuestions.some(asked => asked.includes(q.substring(0, 30)))
+      );
+
+      const question = availableQuestions.length > 0
+        ? availableQuestions[0]
+        : allQuestions[ctx.askedQuestions.length % allQuestions.length];
+
+      return { prompt: `[MOCK ${ctx.roundType}] ${question}` };
     }
 
     const base =
@@ -97,5 +110,26 @@ export class MockAiProvider implements AiProvider {
     const summary = `Mock analysis: Resume appears to be for ${targetRole} role. Detected ${skills.length} relevant skills. Text length: ${resumeText.length} characters.`;
 
     return { experience, skills, education, summary };
+  }
+
+  async generateProfile(ctx: {
+    transcript: { question: string; answer: string }[];
+    role: string;
+    level: string;
+  }): Promise<string> {
+    const answerCount = ctx.transcript.length;
+    const totalWords = ctx.transcript.reduce((sum, t) => sum + t.answer.split(' ').length, 0);
+    const avgWords = Math.round(totalWords / Math.max(answerCount, 1));
+
+    return `**Candidate Profile Summary**
+
+Role: ${ctx.role} (${ctx.level})
+Questions Answered: ${answerCount}
+Average Response Length: ${avgWords} words
+
+**Communication Style**: ${avgWords > 20 ? 'Detailed and thorough' : 'Concise and direct'}
+**Engagement Level**: ${answerCount >= 3 ? 'Fully engaged throughout the screening' : 'Partially engaged'}
+
+This is a mock profile generated for testing purposes.`;
   }
 }

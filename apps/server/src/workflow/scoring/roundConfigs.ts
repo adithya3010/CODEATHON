@@ -14,7 +14,7 @@ export const roundConfigs: Record<RoundType, RoundScoringConfig> = {
     dimensions: ["communication", "relevance", "presentation"],
     weights: { communication: 0.4, relevance: 0.35, presentation: 0.25 },
     passThreshold: 60,
-    questionsPerRound: 2
+    questionsPerRound: 3
   },
   TECHNICAL: {
     roundType: "TECHNICAL",
